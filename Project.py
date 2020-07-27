@@ -168,6 +168,75 @@ df_train = swr.transform(df_train)
 display(df_train)
 # reviews_swr.write.saveAsTable('reviews_swr', mode = 'overwrite')
 
+
+# COMMAND ----------
+
+from scipy.stats import t
+
+# COMMAND ----------
+
+def checktstat(df,colname):
+  ###Function takes a data frame, and column name, and performs a t-test to assess impact on score
+  ###Function returns a message, and the t-statistic
+  #check number of categories
+  num_cats = df.select(F.countDistinct(colname).alias("count")).collect()[0]["count"]
+  
+
+  #Check if column is categorical
+  if (num_cats > 2)| (num_cats==1):
+    check = "column not binary"
+    useful = "NA"
+  else:
+    #Calculate mean by group
+    mean_values = df.groupBy(colname).agg(F.mean('score').alias("mean")).collect()
+    label1 = mean_values[0][colname]
+    label2 = mean_values[1][colname]
+    mean1 = mean_values[0]["mean"]
+    mean2 = mean_values[1]["mean"]
+
+    #Calculate standard deviation by group
+    stddev_values = df.groupBy(colname).agg(F.stddev('score').alias("stddev")).collect()
+    stddev1 = stddev_values[0]["stddev"]
+    stddev2 = stddev_values[1]["stddev"]
+
+    #Count group size
+    counts = df.groupBy(colname).agg(F.count('score').alias("count")).collect()
+    count1 = counts[0]["count"]
+    count2 = counts[1]["count"]
+
+    #calculate standard errors
+    std_err1 = stddev1/(count1**0.5)
+    std_err2 = stddev2/(count2**0.5)
+
+    std_err_dif = (std_err1**2 + std_err2**2)**0.5
+
+    #calculate t statistic
+    t_stat  = (mean1 - mean2) / std_err_dif
+
+    degrees_freedom = count1+count2-2
+    alpha = 0.05
+    critical = t.ppf(1.0 - alpha, degrees_freedom)
+
+    # calculate the p-value
+    p = (1 - t.cdf(abs(t_stat), degrees_freedom)) * 2
+    
+    #check signficance
+    if abs(t_stat) <= critical:
+      check = "Variable not significant"
+      useful = abs(t_stat)
+    else:
+      check = "Variable significant"
+      useful = abs(t_stat)
+   
+    
+  return check,useful
+
+
+# COMMAND ----------
+test1,tstat = checktstat(df_train,"no_follow")
+print(test1)
+print(tstat)
+
 # COMMAND ----------
 
 from pyspark.ml.feature import Word2Vec
