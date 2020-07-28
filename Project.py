@@ -249,7 +249,20 @@ pop_thresh = 20
 df_train = df_train.withColumn("commondomain",F.when((df_train["domaincount"]>pop_thresh),1).otherwise(0))
 #need to add lookup for test dataset
 
+# COMMAND ----------
+#Split subreddits into binary columns
+from pyspark.ml.feature import StringIndexer
+from pyspark.ml.feature import OneHotEncoder
+stringIndexer = StringIndexer(inputCol="subreddit", outputCol="subredditIndex")
+model = stringIndexer.fit(df_train)
+df_train = model.transform(df_train)
 
+num_reddits = df_train.select(F.countDistinct("subreddit")).collect()[0][0]
+
+for i in range(num_reddits):
+  col_name = "subreddit_"
+  col_name = col_name + str(i)
+  df_train = df_train.withColumn(col_name,F.when((df_train["subredditIndex"]==i),1).otherwise(0))
 
 # COMMAND ----------
 
