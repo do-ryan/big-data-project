@@ -233,9 +233,23 @@ def checktstat(df,colname):
 
 
 # COMMAND ----------
+#test the t-stat function with a feature, it bumps an error if there are null values in the column
 test1,tstat = checktstat(df_train,"no_follow")
 print(test1)
 print(tstat)
+
+
+
+# COMMAND ----------
+#Add a column with the frequency of the domain in the training dataset
+df_train = df_train.withColumn('domaincount', F.count('domain').over(Window.partitionBy('domain')))
+#define threshold at which the count is considered common
+pop_thresh = 20
+#Add binary column for whether it is common domain
+df_train = df_train.withColumn("commondomain",F.when((df_train["domaincount"]>pop_thresh),1).otherwise(0))
+#need to add lookup for test dataset
+
+
 
 # COMMAND ----------
 
