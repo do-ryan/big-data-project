@@ -102,7 +102,7 @@ train_set_pd = train_set1.toPandas()
 train_set_pd.corr() 
 
 import matplotlib.pyplot as plt
-plt.figure()
-train_set_pd[['author', 'score']].boxplot(by='author') 
+plt.figure(figsize=[30,20])
+train_set_pd[['author', 'score']].sort_values(by='author')[0:1000].boxplot(by='author') 
 plt.xticks(rotation=90) 
 plt.savefig('boxplot')
