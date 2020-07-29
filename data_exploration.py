@@ -101,4 +101,8 @@ train_set_pd = train_set1.toPandas()
 """ Correlation matrix of numerical/boolean data"""
 train_set_pd.corr() 
 
-train_set_pd[['author', 'score']][0:10].pivot(columns='author', values='score').boxplot().showfigure().savefig('boxplot') 
+import matplotlib.pyplot as plt
+plt.figure()
+train_set_pd[['author', 'score']].boxplot(by='author') 
+plt.xticks(rotation=90) 
+plt.savefig('boxplot')
