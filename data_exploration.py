@@ -101,9 +101,39 @@ train_set_pd = train_set1.toPandas()
 """ Correlation matrix of numerical/boolean data"""
 train_set_pd.corr() 
 
+""" Scores grouped by author/ domain"""
 import matplotlib.pyplot as plt
 plt.figure(figsize=[30,20])
-train_set_pd[['author', 'score']].sort_values(by='author')[0:1000].boxplot(by='author') 
+train_set_pd[['author', 'score']].sort_values(by='author')[0:150].boxplot(by='author') 
 plt.xticks(rotation=90) 
-plt.tight_layout()
+plt.gcf().subplots_adjust(bottom=0.3)
 plt.savefig('boxplot_score_groupedby_author')
+
+plt.figure(figsize=[40, 40]) 
+train_set_pd[['domain', 'score']].sort_values(by='domain')[0:150].boxplot(by='domain') 
+plt.gcf().subplots_adjust(bottom=0.4) 
+plt.xticks(rotation=90) 
+plt.savefig('boxplot_score_groupedby_domain') 
+
+""" Score column (y label) histogram """
+plt.figure()
+gre_histogram = train_set1.select('score').rdd.flatMap(lambda x: x).histogram(sc.parallelize(range(0, 601, 25)).collect())
+
+# Loading the Computed Histogram into a Pandas Dataframe for plotting
+pd.DataFrame(list(zip(*gre_histogram)), columns=['bin', 'frequency']).set_index('bin').plot(kind='bar')
+plt.savefig('score_histogram')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
