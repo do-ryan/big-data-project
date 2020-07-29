@@ -101,4 +101,4 @@ train_set_pd = train_set1.toPandas()
 """ Correlation matrix of numerical/boolean data"""
 train_set_pd.corr() 
 
-
+train_set_pd[['author', 'score']][0:10].pivot(columns='author', values='score').boxplot().showfigure().savefig('boxplot') 
