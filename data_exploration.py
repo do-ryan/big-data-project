@@ -115,6 +115,17 @@ plt.gcf().subplots_adjust(bottom=0.4)
 plt.xticks(rotation=90) 
 plt.savefig('boxplot_score_groupedby_domain') 
 
+plt.figure(figsize=[40, 40]) 
+train_set_pd[['subreddit', 'score']].sort_values(by='subreddit')[0:2000].boxplot(by='subreddit') 
+plt.gcf().subplots_adjust(bottom=0.4) 
+plt.xticks(rotation=90) 
+plt.savefig('boxplot_score_groupedby_subreddit') 
+
+plt.figure(figsize=[40, 40]) 
+train_set_pd[['subreddit_type', 'score']].sort_values(by='subreddit_type')[0:2000].boxplot(by='subreddit_type') 
+plt.gcf().subplots_adjust(bottom=0.4) 
+plt.xticks(rotation=90) 
+plt.savefig('boxplot_score_groupedby_subreddit_type') 
 """ Score column (y label) histogram """
 plt.figure()
 gre_histogram = train_set1.select('score').rdd.flatMap(lambda x: x).histogram(sc.parallelize(range(0, 601, 25)).collect())
@@ -122,6 +133,14 @@ gre_histogram = train_set1.select('score').rdd.flatMap(lambda x: x).histogram(sc
 # Loading the Computed Histogram into a Pandas Dataframe for plotting
 pd.DataFrame(list(zip(*gre_histogram)), columns=['bin', 'frequency']).set_index('bin').plot(kind='bar')
 plt.savefig('score_histogram')
+
+""" Scatter score vs utf """
+plt.figure()  
+train_set_pd[['created_utc', 'score']].plot(x='created_utc', y='score', kind='scatter') plt.xticks(rotation=90)  
+plt.gcf().subplots_adjust(bottom=0.3)  
+plt.savefig('scatter_createdutf_score')  
+
+
 
 
 
