@@ -105,5 +105,5 @@ import matplotlib.pyplot as plt
 plt.figure(figsize=[30,20])
 train_set_pd[['author', 'score']].sort_values(by='author')[0:1000].boxplot(by='author') 
 plt.xticks(rotation=90) 
-plt.rc('font', size=8)
+plt.tight_layout()
 plt.savefig('boxplot_score_groupedby_author')
