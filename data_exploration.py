@@ -126,6 +126,7 @@ train_set_pd[['subreddit_type', 'score']].sort_values(by='subreddit_type')[0:200
 plt.gcf().subplots_adjust(bottom=0.4) 
 plt.xticks(rotation=90) 
 plt.savefig('boxplot_score_groupedby_subreddit_type') 
+
 """ Score column (y label) histogram """
 plt.figure()
 gre_histogram = train_set1.select('score').rdd.flatMap(lambda x: x).histogram(sc.parallelize(range(0, 601, 25)).collect())
@@ -140,6 +141,11 @@ train_set_pd[['created_utc', 'score']].plot(x='created_utc', y='score', kind='sc
 plt.gcf().subplots_adjust(bottom=0.3)  
 plt.savefig('scatter_createdutf_score')  
 
+""" Scatter score vs num comments """
+plt.figure(figsize=[30, 30])  
+train_set_pd[['num_comments', 'score']].plot(x='num_comments', y='score', kind='scatter') plt.xticks(rotation=90)  
+plt.gcf().subplots_adjust(bottom=0.3)  
+plt.savefig('scatter_num_comments_score')  
 
 
 
