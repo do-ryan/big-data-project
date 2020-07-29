@@ -18,12 +18,16 @@ import pandas as pd
 # sqlc = SQLContext(sc)
 # print(sc.getConf().getAll())     
 
+""""""""""""""""""""
 """STEP 2: importing data"""
+""""""""""""""""""""
 
 df_train = spark.read.format('json').option('inferSchema', 'false').option('header', 'false').option('sep', ',').load('RS_v2_2006-03')
 df_test = spark.read.format('json').option('inferSchema', 'false').option('header', 'false').option('sep', ',').load('RS_v2_2006-04')
 
+""""""""""""""""""""
 """STEP 3: CLEANING DATA"""
+""""""""""""""""""""
 
 """SELECTING columns with single or null values in the columns -------------------------------------------"""
 
@@ -91,7 +95,9 @@ test_set1 = col_preprocess(df_test)
 print("No. of columns in training data set are: ", len(train_set1.columns))
 print("No. of columns in test data set are: ", len(test_set1.columns))
 
+""""""""""""""""""""
 """ STEP 4: Data exploration"""
+""""""""""""""""""""
 
 train_set1.select([count(when(col(c).isNull(), c)).alias(c) for c in train_set1.columns]).show()
 test_set1.select([count(when(col(c).isNull(), c)).alias(c) for c in test_set1.columns]).show()
@@ -137,17 +143,36 @@ plt.savefig('score_histogram')
 
 """ Scatter score vs utf """
 plt.figure()  
-train_set_pd[['created_utc', 'score']].plot(x='created_utc', y='score', kind='scatter') plt.xticks(rotation=90)  
+train_set_pd[['created_utc', 'score']].plot(x='created_utc', y='score', kind='scatter')
+plt.xticks(rotation=90)  
 plt.gcf().subplots_adjust(bottom=0.3)  
 plt.savefig('scatter_createdutf_score')  
 
 """ Scatter score vs num comments """
 plt.figure(figsize=[30, 30])  
-train_set_pd[['num_comments', 'score']].plot(x='num_comments', y='score', kind='scatter') plt.xticks(rotation=90)  
+train_set_pd[['num_comments', 'score']].plot(x='num_comments', y='score', kind='scatter') 
+plt.xticks(rotation=90)  
 plt.gcf().subplots_adjust(bottom=0.3)  
 plt.savefig('scatter_num_comments_score')  
 
 
+""""""""""""""""""""
+""" STEP 5: Feature Engineering """
+""""""""""""""""""""
+# ------------------------------ 'title' = google translate ------------------------------
+
+dbutils.library.installPyPI("googletrans")
+from googletrans import Translator
+from pyspark.sql.functions import udf
+
+def translation(x):
+  
+  translator = Translator()
+  return translator.translate(str(x), dest = 'en').text
+
+translatio = udf(translation)
+spark.udf.register('translatio', translatio)
+dd = train_set1.withColumn('new', translatio('title'))
 
 
 
