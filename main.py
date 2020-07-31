@@ -223,6 +223,8 @@ df_test = df_test.drop("domainlookup")
 df_test = df_test.fillna({'domain_avg_score':domain_avg_avg})
 df_test = df_test.fillna({'avg_author_score':author_avg_avg})
 
+
+
 #Join common domain and test data, impute 0 if null (not common)
 df_common_domain = df_train['domain','commondomain'].distinct()
 df_common_domain = df_common_domain.selectExpr("domain as domainlookup", "commondomain as commondomain")
@@ -231,4 +233,4 @@ df_test = df_test.join(df_common_domain, df_test.domain == df_common_domain.doma
 df_test = df_test.drop("domainlookup")
 df_test = df_test.fillna({'commondomain':0})
 
-#need to do the same for ' common domain' on test set, need to one-hot encode the subreddits for test set also
+#need to one-hot encode test set subreddits
