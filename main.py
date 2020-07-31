@@ -233,4 +233,22 @@ df_test = df_test.join(df_common_domain, df_test.domain == df_common_domain.doma
 df_test = df_test.drop("domainlookup")
 df_test = df_test.fillna({'commondomain':0})
 
-#need to one-hot encode test set subreddits
+### Create column features for test set based on subreddit, aligned with features from training set
+###Join on subreddit index where subreddit names are the same
+df_subreddit_index = df_train['subreddit','subredditIndex'].distinct()
+df_subreddit_index = df_subreddit_index.selectExpr("subreddit as subredditlookup", "subredditIndex as subredditIndex")
+
+df_test = df_test.join(df_subreddit_index, df_test.subreddit == df_subreddit_index.subredditlookup,how='left')
+df_test = df_test.drop("subredditlookup")
+#Impute index that is out of range of one-hot encoding loop, columns will be all 0's (i.e. not recognized from training set)
+df_test = df_test.fillna({'subredditIndex':55})
+
+
+#One-hot encoding loop
+#Length of for loop depends on number of subreddits in training set
+num_reddits = df_train.select(F.countDistinct("subreddit")).collect()[0][0]
+
+for i in range(num_reddits):
+  col_name = "subreddit_"
+  col_name = col_name + str(i)
+  df_test = df_test.withColumn(col_name,F.when((df_test["subredditIndex"]==i),1).otherwise(0))
