@@ -156,25 +156,6 @@ plt.gcf().subplots_adjust(bottom=0.3)
 plt.savefig('scatter_num_comments_score')  
 
 
-""""""""""""""""""""
-""" STEP 5: Feature Engineering """
-""""""""""""""""""""
-# ------------------------------ 'title' = google translate ------------------------------
-
-dbutils.library.installPyPI("googletrans")
-from googletrans import Translator
-from pyspark.sql.functions import udf
-
-def translation(x):
-  
-  translator = Translator()
-  return translator.translate(str(x), dest = 'en').text
-
-translatio = udf(translation)
-spark.udf.register('translatio', translatio)
-dd = train_set1.withColumn('new', translatio('title'))
-
-
 
 
 
