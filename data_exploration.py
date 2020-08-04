@@ -64,7 +64,7 @@ plt.savefig('./figures/boxplot_score_groupedby_subreddit_type')
 
 """ Score column (y label) histogram """
 plt.figure()
-gre_histogram = train_set1.select('score').rdd.flatMap(lambda x: x).histogram(sc.parallelize(range(0, 601, 25)).collect())
+gre_histogram = df_train.select('score').rdd.flatMap(lambda x: x).histogram(sc.parallelize(range(0, 601, 25)).collect())
 
 # Loading the Computed Histogram into a Pandas Dataframe for plotting
 pd.DataFrame(list(zip(*gre_histogram)), columns=['bin', 'frequency']).set_index('bin').plot(kind='bar')
