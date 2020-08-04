@@ -231,11 +231,23 @@ def feature_transform(df):
     df_train_trans.groupby('hour').avg('score')
     df_train_trans.groupby('day_of_week').avg('score').show()
 
+    return df_train_trans
+
 if __name__ == '__main__':
-    df_train, df_test = clean_data(spark=spark)
-    df_train_trans = feature_transform(df_train)
-    df_test_trans = feature_transform(df_test)
+    generate_features_flag = False
+
+    if generate_features_flag:
+        df_train, df_test = clean_data(spark=spark)
+        df_train_trans = feature_transform(df_train)
+        df_test_trans = feature_transform(df_test)
+        # Saving the dataframe with all original and generated features (in parquet format)
+        df_train_trans.coalesce(1).write.save("df_train_trans.json", format = 'json')
+        df_test_trans.coalesce(1).write.save("df_test_trans.json", format = 'json')
     
+    # Loading the saved train and test (parquet) files
+    df_train_trans = spark.read.json("df_train_trans.json")
+    df_test_trans = spark.read.json("df_train_trans.json")
+ 
     df_train_trans_pd = df_train_trans.toPandas()
     plt.figure(figsize = (15,15))
     sns.heatmap(df_train_trans_pd.corr(), annot = True, fmt = '.2g')
