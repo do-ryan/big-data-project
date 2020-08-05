@@ -14,7 +14,7 @@ from pyspark.mllib.stat import Statistics
 from googletrans import Translator
 from textblob import TextBlob
 
-from pyspark.ml.feature import CountVectorizer, StringIndexer, RegexTokenizer,StopWordsRemover
+from pyspark.ml.feature import CountVectorizer, StringIndexer, RegexTokenizer,StopWordsRemover, OneHotEncoder
 from pyspark.ml.feature import HashingTF, IDF
 from pyspark.ml.feature import Word2Vec
 from pyspark.ml.feature import VectorAssembler
@@ -200,7 +200,8 @@ def feature_transform(df):
     df_train_trans = df_train_trans.withColumn('wordCount', F.size(F.split(F.col('title_translated'), ' ')))
     df_train_trans = df_train_trans.withColumn("length_of_title", F.length("title_translated"))
     df_train_trans = df_train_trans.withColumn('avg_word_length', (F.col('length_of_title')-F.col('wordCount')+1)/F.col('wordCount'))
-
+    
+    """
     # TF-IDF on Title (stopwords removed)
     # map title to term frequencies
     hashingTF = HashingTF(inputCol="title_stopwords_removed", outputCol="title_tf", numFeatures=15)
@@ -216,6 +217,7 @@ def feature_transform(df):
     word2Vec = Word2Vec(vectorSize=5, minCount=1, inputCol="title_stopwords_removed", outputCol="title_word2vec")
     model_w2v = word2Vec.fit(df_train_trans)
     df_train_trans = model_w2v.transform(df_train_trans)
+    """
 
     # Feature Engineering on "created_utc" column
     df_train_trans = df_train_trans.withColumn("date",F.to_timestamp(df_train_trans["created_utc"]))
@@ -228,13 +230,43 @@ def feature_transform(df):
     df_train_trans = df_train_trans.withColumn('no_of_digits', digit('url').cast('float'))
     df_train_trans = df_train_trans.withColumn('url_length', F.length('url').cast('int'))
     
-    df_train_trans.groupby('hour').avg('score')
+    # One-hot encode subreddit_type train and test set
+    col_name = "public"
+    df_train_trans = df_train_trans.withColumn(col_name,F.when((df_train_trans["subreddit_type"]=="public"),1).otherwise(0))
+    col_name = "archived"
+    df_train_trans = df_train_trans.withColumn(col_name,F.when((df_train_trans["subreddit_type"]=="archived"),1).otherwise(0))
+    #drop original column
+    df_train_trans = df_train_trans.drop("subreddit_type")
+
+    #One-hot encode whitelist_status train and test set
+    col_name = "all_ads"
+    df_train_trans = df_train_trans.withColumn(col_name,F.when((df_train_trans["whitelist_status"]=="all_ads"),1).otherwise(0))
+    col_name = "promo_adult_nsfw"
+    df_train_trans = df_train_trans.withColumn(col_name,F.when((df_train_trans["whitelist_status"]=="promo_adult_nsfw"),1).otherwise(0))
+    #drop original column
+    df_train_trans = df_train_trans.drop("whitelist_status")
+
+    # Subreddit one-hot encoding training set
+    stringIndexer = StringIndexer(inputCol="subreddit", outputCol="subredditIndex")
+    model = stringIndexer.fit(df_train_trans)
+    df_train_trans = model.transform(df_train_trans)
+    num_reddits = df_train_trans.select(F.countDistinct("subreddit")).collect()[0][0]
+    for i in range(num_reddits):
+        col_name = "subreddit_"
+        col_name = col_name + str(i)
+        df_train_trans = df_train_trans.withColumn(col_name,F.when((df_train_trans["subredditIndex"]==i),1).otherwise(0))
+
+    #Drop subreddit and subreddit index column from train and test sets
+    df_train_trans = df_train_trans.drop("subreddit")
+    df_train_trans = df_train_trans.drop("subredditIndex")
+
+    df_train_trans.groupby('hour').avg('score').show()
     df_train_trans.groupby('day_of_week').avg('score').show()
 
     return df_train_trans
 
 if __name__ == '__main__':
-    generate_features_flag = False
+    generate_features_flag = True 
 
     if generate_features_flag:
         df_train, df_test = clean_data(spark=spark)
@@ -246,7 +278,7 @@ if __name__ == '__main__':
     
     # Loading the saved train and test (parquet) files
     df_train_trans = spark.read.json("df_train_trans.json")
-    df_test_trans = spark.read.json("df_train_trans.json")
+    df_test_trans = spark.read.json("df_test_trans.json")
  
     df_train_trans_pd = df_train_trans.toPandas()
     plt.figure(figsize = (15,15))
