@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pyspark.sql import Row, Window
 from pyspark.sql.types import *
 from pyspark.sql.functions import *
@@ -273,8 +275,8 @@ if __name__ == '__main__':
         df_train_trans = feature_transform(df_train)
         df_test_trans = feature_transform(df_test)
         # Saving the dataframe with all original and generated features (in parquet format)
-        df_train_trans.coalesce(1).write.save("df_train_trans.json", format = 'json')
-        df_test_trans.coalesce(1).write.save("df_test_trans.json", format = 'json')
+        df_train_trans.coalesce(1).write.save("df_train_trans.json", format = 'json', mode = 'overwrite')
+        df_test_trans.coalesce(1).write.save("df_test_trans.json", format = 'json', mode = 'overwrite')
     
     # Loading the saved train and test (parquet) files
     df_train_trans = spark.read.json("df_train_trans.json")
