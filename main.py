@@ -48,6 +48,7 @@ def random_forest_regressor(result_trainpca, result_testpca):
     cvModel = crossval.fit(df_train_sel)
     predictions_cv = cvModel.transform(df_test_sel)
     print("R2 on test data (cross-validated) = %g" % rf_evaluator.evaluate(predictions_cv))
+    # best hyperparams
     print(cvModel.getEstimatorParamMaps()[np.argmax(cvModel.avgMetrics)])
     return cvModel 
 
@@ -89,6 +90,7 @@ def linear_regressor(result_trainpca, result_testpca):
     cvModel = crossval.fit(result_trainpca)
     predictions_cv = cvModel.transform(result_testpca)
     print("R2 on test data (cross-validated) = %g" % lr_evaluator.evaluate(predictions_cv))
+    # best hyperparams
     print(cvModel.getEstimatorParamMaps()[np.argmax(cvModel.avgMetrics)])
     return cvModel 
 
@@ -128,6 +130,7 @@ def decision_tree_regressor(result_trainpca, result_testpca):
     cvModel = crossval.fit(df_train_sel)
     predictions_cv = cvModel.transform(df_test_sel)
     print("R2 on test data (cross-validated) = %g" % rf_evaluator.evaluate(predictions_cv))
+    # best hyperparams
     print(cvModel.getEstimatorParamMaps()[np.argmax(cvModel.avgMetrics)])
     return cvModel 
 if __name__ == '__main__':
