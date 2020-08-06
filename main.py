@@ -158,6 +158,6 @@ if __name__ == '__main__':
     result_testpca = result_testpca.select("pcaFeatures", "score")
     result_trainpca = result_trainpca.select("pcaFeatures", "score")
 
-    # rf_model = random_forest_regressor(result_trainpca, result_testpca)
-    # lr_model = linear_regressor(result_trainpca, result_testpca)
+    rf_model = random_forest_regressor(result_trainpca, result_testpca)
+    lr_model = linear_regressor(result_trainpca, result_testpca)
     dt_model = decision_tree_regressor(result_trainpca, result_testpca)
