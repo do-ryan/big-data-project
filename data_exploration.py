@@ -36,6 +36,10 @@ train_set_pd = df_train.toPandas()
 """ Correlation matrix of numerical/boolean data"""
 train_set_pd.corr() 
 
+df_train_trans = spark.read.json('train.json')
+df_test_trans = spark.read.json('test.json')
+df_train_trans_pd = df_train_trans.toPandas()
+
 """ Scores grouped by author/ domain"""
 import matplotlib.pyplot as plt
 plt.figure(figsize=[30,40])
@@ -48,19 +52,34 @@ plt.figure(figsize=[40, 80])
 train_set_pd[['domain', 'score']].sort_values(by='domain')[0:300].boxplot(by='domain') 
 plt.gcf().subplots_adjust(bottom=0.4) 
 plt.xticks(rotation=90) 
+plt.xlabel('domains', fontsize=7)
 plt.savefig('./figures/boxplot_score_groupedby_domain') 
 
 plt.figure(figsize=[40, 40]) 
-train_set_pd[['subreddit', 'score']].sort_values(by='subreddit')[0:4000].boxplot(by='subreddit') 
+train_set_pd[['subreddit', 'score']].sort_values(by='subreddit')[0:7000].boxplot(by='subreddit') 
 plt.gcf().subplots_adjust(bottom=0.4) 
+plt.xlabel('subreddit', fontsize=9)
 plt.xticks(rotation=90) 
 plt.savefig('./figures/boxplot_score_groupedby_subreddit') 
 
 plt.figure(figsize=[40, 40]) 
-train_set_pd[['subreddit_type', 'score']].sort_values(by='subreddit_type')[0:4000].boxplot(by='subreddit_type') 
+train_set_pd[['subreddit_type', 'score']].sort_values(by='subreddit_type').boxplot(by='subreddit_type') 
 plt.gcf().subplots_adjust(bottom=0.4) 
 plt.xticks(rotation=90) 
 plt.savefig('./figures/boxplot_score_groupedby_subreddit_type') 
+
+plt.figure(figsize=[40, 40]) 
+df_train_trans_pd[['day_of_week', 'score']].boxplot(by='day_of_week') 
+plt.gcf().subplots_adjust(bottom=0.4) 
+plt.xticks(rotation=90) 
+plt.savefig('./figures/boxplot_score_groupedby_dayofweek') 
+
+plt.figure(figsize=[40, 40]) 
+df_train_trans_pd[['hour', 'score']].boxplot(by='hour') 
+plt.gcf().subplots_adjust(bottom=0.4) 
+plt.xticks(rotation=90) 
+plt.xlabel('hour', fontsize=8)
+plt.savefig('./figures/boxplot_score_groupedby_hour') 
 
 """ Score column (y label) histogram """
 plt.figure()
