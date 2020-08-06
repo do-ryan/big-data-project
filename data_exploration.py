@@ -38,26 +38,26 @@ train_set_pd.corr()
 
 """ Scores grouped by author/ domain"""
 import matplotlib.pyplot as plt
-plt.figure(figsize=[30,20])
-train_set_pd[['author', 'score']].sort_values(by='author')[0:150].boxplot(by='author') 
+plt.figure(figsize=[30,40])
+train_set_pd[['author', 'score']].sort_values(by='author')[0:300].boxplot(by='author') 
 plt.xticks(rotation=90) 
 plt.gcf().subplots_adjust(bottom=0.3)
 plt.savefig('./figures/boxplot_score_groupedby_author')
 
-plt.figure(figsize=[40, 40]) 
-train_set_pd[['domain', 'score']].sort_values(by='domain')[0:150].boxplot(by='domain') 
+plt.figure(figsize=[40, 80]) 
+train_set_pd[['domain', 'score']].sort_values(by='domain')[0:300].boxplot(by='domain') 
 plt.gcf().subplots_adjust(bottom=0.4) 
 plt.xticks(rotation=90) 
 plt.savefig('./figures/boxplot_score_groupedby_domain') 
 
 plt.figure(figsize=[40, 40]) 
-train_set_pd[['subreddit', 'score']].sort_values(by='subreddit')[0:2000].boxplot(by='subreddit') 
+train_set_pd[['subreddit', 'score']].sort_values(by='subreddit')[0:4000].boxplot(by='subreddit') 
 plt.gcf().subplots_adjust(bottom=0.4) 
 plt.xticks(rotation=90) 
 plt.savefig('./figures/boxplot_score_groupedby_subreddit') 
 
 plt.figure(figsize=[40, 40]) 
-train_set_pd[['subreddit_type', 'score']].sort_values(by='subreddit_type')[0:2000].boxplot(by='subreddit_type') 
+train_set_pd[['subreddit_type', 'score']].sort_values(by='subreddit_type')[0:4000].boxplot(by='subreddit_type') 
 plt.gcf().subplots_adjust(bottom=0.4) 
 plt.xticks(rotation=90) 
 plt.savefig('./figures/boxplot_score_groupedby_subreddit_type') 
