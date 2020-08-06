@@ -10,6 +10,8 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 import numpy as np
 
+sc = SparkContext()
+
 def random_forest_regressor(result_trainpca, result_testpca):
     rf = RandomForestRegressor(featuresCol='pcaFeatures') # featuresCol="indexedFeatures",numTrees=2, maxDepth=2, seed=42
 
@@ -50,6 +52,7 @@ def random_forest_regressor(result_trainpca, result_testpca):
     print("R2 on test data (cross-validated) = %g" % rf_evaluator.evaluate(predictions_cv))
     # best hyperparams
     print(cvModel.getEstimatorParamMaps()[np.argmax(cvModel.avgMetrics)])
+    cvModel.save(sc, 'dt_model.model')
     return cvModel 
 
 def linear_regressor(result_trainpca, result_testpca):
@@ -92,6 +95,7 @@ def linear_regressor(result_trainpca, result_testpca):
     print("R2 on test data (cross-validated) = %g" % lr_evaluator.evaluate(predictions_cv))
     # best hyperparams
     print(cvModel.getEstimatorParamMaps()[np.argmax(cvModel.avgMetrics)])
+    cvModel.save(sc, 'dt_model.model')
     return cvModel 
 
 def decision_tree_regressor(result_trainpca, result_testpca):
@@ -132,6 +136,7 @@ def decision_tree_regressor(result_trainpca, result_testpca):
     print("R2 on test data (cross-validated) = %g" % rf_evaluator.evaluate(predictions_cv))
     # best hyperparams
     print(cvModel.getEstimatorParamMaps()[np.argmax(cvModel.avgMetrics)])
+    cvModel.save(sc, 'dt_model.model')
     return cvModel 
 if __name__ == '__main__':
     df_train_trans = spark.read.json("train.json")

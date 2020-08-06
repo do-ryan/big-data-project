@@ -14,7 +14,7 @@ from pyspark.mllib.stat import Statistics
 
 import pandas as pd
 
-from main import clean_data
+from preprocess import clean_data
 
 # sc = SparkContext()
 # spark = SparkSession(sc)
