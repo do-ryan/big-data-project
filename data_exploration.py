@@ -75,7 +75,7 @@ plt.xticks(rotation=90)
 plt.savefig('./figures/boxplot_score_groupedby_dayofweek') 
 
 plt.figure(figsize=[40, 40]) 
-df_train_trans_pd[['hour', 'score']].boxplot(by='hour', showmeans=True) 
+df_train_trans_pd[['hour', 'score']].boxplot(by='hour', showfliers=False, showmeans=True) 
 plt.gcf().subplots_adjust(bottom=0.4) 
 plt.xticks(rotation=90) 
 plt.xlabel('hour', fontsize=8)
