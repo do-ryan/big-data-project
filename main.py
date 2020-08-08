@@ -10,8 +10,6 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 import numpy as np
 
-sc = SparkContext()
-
 def random_forest_regressor(result_trainpca, result_testpca):
     rf = RandomForestRegressor(featuresCol='pcaFeatures') # featuresCol="indexedFeatures",numTrees=2, maxDepth=2, seed=42
 
